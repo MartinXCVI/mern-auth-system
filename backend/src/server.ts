@@ -23,7 +23,11 @@ app.use(cors({ credentials: true }))
 
 console.log(`Mode: ${NODE_ENV}`)
 
+// API Endpoints
+import authRouter from './routes/auth.routes.js'
+
 app.get('/', (req: Request, res: Response)=> { res.send("API Working") })
+app.use('/api/auth', authRouter)
 
 app.listen(PORT, ()=> {
   console.log(`Server running on port: ${PORT}...`)
