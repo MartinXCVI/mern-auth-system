@@ -10,6 +10,9 @@ const envSchema = z.object({
   JWT_SECRET: z.string(),
   JWT_REFRESH_SECRET: z.string(),
   DATABASE_URI: z.string().url(),
+  SMTP_USER: z.string(),
+  SMTP_PASSWORD: z.string(),
+  SENDER_EMAIL: z.string()
 })
 
 const safeParsed = envSchema.safeParse(process.env)
@@ -27,5 +30,8 @@ export const {
   SALT_ROUNDS,
   JWT_SECRET,
   JWT_REFRESH_SECRET,
-  DATABASE_URI
+  DATABASE_URI,
+  SMTP_USER,
+  SMTP_PASSWORD,
+  SENDER_EMAIL
 } = env
