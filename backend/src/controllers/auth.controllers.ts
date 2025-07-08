@@ -215,7 +215,7 @@ export const logout = async (req: Request, res: Response): Promise<void> => {
 
 /*
 * @desc: Send verification OTP to the user's email
-* @route: ?
+* @route: /api/auth/send-verify-otp
 * @method: POST
 * @access: Private
 */
@@ -280,7 +280,7 @@ export const sendVerifyOtp = async (req: IRequestWithUser, res: Response): Promi
 
 /*
 * @desc: Verify user email
-* @route: ?
+* @route: /api/auth/verify-email
 * @method: POST
 * @access: Private
 */
@@ -353,7 +353,7 @@ export const verifyEmail = async (req: IRequestWithUser, res: Response): Promise
 
 /*
 * @desc: Check if the user is authenticated (used for client session checks)
-* @route: ?
+* @route: /api/auth/is-auth
 * @method: POST
 * @access: Private
 */
@@ -377,7 +377,7 @@ export const isAuthenticated = async (req: IRequestWithUser, res: Response): Pro
 
 /*
 * @desc: Send the password reset OTP
-* @route: ?
+* @route: /api/auth/send-reset-otp
 * @method: POST
 * @access: Public
 */
@@ -434,7 +434,7 @@ export const sendResetOtp = async (req: Request, res: Response): Promise<void> =
 
 /*
 * @desc: Reset user password
-* @route: ?
+* @route: /api/auth/reset-password
 * @method: POST
 * @access: Public
 */
