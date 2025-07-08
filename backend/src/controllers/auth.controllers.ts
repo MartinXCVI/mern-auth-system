@@ -8,6 +8,7 @@ import UserModel from "../models/User.model.js"
 import validator from 'validator'
 import transporter from "../config/nodemailer.js"
 
+
 /*
 * @desc: Register a new user
 * @route: /api/auth/register
@@ -372,3 +373,125 @@ export const isAuthenticated = async (req: IRequestWithUser, res: Response): Pro
   }
   return
 } // End of isAuthenticated controller
+
+
+/*
+* @desc: Send the password reset OTP
+* @route: ?
+* @method: POST
+* @access: Public
+*/
+export const sendResetOtp = async (req: Request, res: Response): Promise<void> => {
+  const { email } = req.body
+  if(!email) {
+    res.status(400).json({
+      success: false,
+      message: "Email is required"
+    })
+    return
+  }
+  // Attempting to send the password reset OTP
+  try {
+    // Getting user by email & validating
+    const user = await UserModel.findOne({ email })
+    if(!user) {
+      res.status(404).json({
+        success: false,
+        message: "User not found or does not exist"
+      })
+      return
+    }
+    // Generating a six digits random number
+    const otp: string = String(Math.floor(100000 + Math.random() * 900000))
+    
+    user.resetOtp = otp
+    user.resetOtpExpireAt = Date.now() + 15 * 60 * 1000
+
+    await user.save()
+
+    const mailOptions = {
+      from: SENDER_EMAIL,
+      to: user.email,
+      subject: 'Password Reset OTP',
+      text: `Your OTP for resetting your password is ${otp} — Use this OTP to proceed with your password reset.`
+    }
+    await transporter.sendMail(mailOptions)
+    // Successful response
+    res.status(200).json({
+      success: true,
+      message: "Reset password OTP sent to user's email"
+    })
+  } catch(error) {
+    console.error(`Error on sending reset password OTP: ${error instanceof Error ? error.message : error}`)
+    res.status(500).json({
+      success: false,
+      message: "Internal server error while attempting to send the reset password OTP",
+      error: error instanceof Error ? error.message : error
+    })
+  }
+} // End of sendResetOtp
+
+
+/*
+* @desc: Reset user password
+* @route: ?
+* @method: POST
+* @access: Public
+*/
+export const resetPassword = async (req: Request, res: Response): Promise<void> => {
+  // Getting data from the request's body & validating
+  const { email, otp, newPassword } = req.body
+  if(!email || !otp || !newPassword) {
+    res.status(400).json({
+      success: false,
+      message: "All fields are required"
+    })
+    return
+  }
+  try {
+    const user = await UserModel.findOne({ email })
+    if(!user) {
+      res.status(404).json({
+        success: false,
+        message: "User not found or does not exist"
+      })
+      return
+    }
+    if(user.resetOtp === "" || user.resetOtp !== otp) {
+      res.status(400).json({
+        success: false,
+        message: "Invalid OTP"
+      })
+      return
+    }
+    if(user.resetOtpExpireAt < Date.now()) {
+      res.status(400).json({
+        success: false,
+        message: "OTP Expired"
+      })
+      return
+    }
+    // Hashing the password w/ bcrypt
+    const saltRounds: number = SALT_ROUNDS || 10
+    const salt: string = await bcrypt.genSalt(saltRounds)
+    const hashedPassword: string = await bcrypt.hash(newPassword, salt)
+
+    user.password = hashedPassword
+    user.resetOtp = ''
+    user.resetOtpExpireAt = 0
+
+    await user.save()
+    // Successful response
+    res.status(200).json({
+      success: true,
+      message: "Password has been reset successfully"
+    })
+  } catch(error) {
+    console.error(`Error on password reset: ${error instanceof Error ? error.message : error}`)
+    res.status(500).json({
+      success: false,
+      message: "Internal server error while attempting to reset user's password",
+      error: error instanceof Error ? error.message : error
+    })
+  }
+} // End of resetPassword controller
