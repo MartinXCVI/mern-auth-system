@@ -1,5 +1,7 @@
+// React imports
+import type { ReactNode } from 'react'
 // React hook imports
-import { useState, type ReactNode } from 'react'
+import { useEffect, useState } from 'react'
 // Context-related imports
 import { AppContext } from './AppContext'
 // Types/Interfaces imports
@@ -19,9 +21,39 @@ export const AppContextProvider = ({ children }: IAppContextProviderProps)=> {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false)
   const [userData, setUserData] = useState<IUserData | null>(null)
 
+  const getAuthState = async (): Promise<void> => {
+    try {
+      const { data } = await axios.get(`${backendUrl}/api/auth/is-auth`, {
+        withCredentials: true
+      })
+      if(data.success) {
+        setIsLoggedIn(true)
+        getUserData()
+      }
+    } catch(error) {
+      const err = error as AxiosError
+
+      if(err.response?.status === 401) {
+        setIsLoggedIn(false)
+        console.info('User is not logged in.')
+      } else {
+        console.error(`Error while retrieving the user's authentication state: ${error instanceof Error ? error.message : error}`)
+        toast.error("Error while retrieving the user's authentication state. Something went wrong while checking your session.")
+      }
+    }
+  }
+
+  // Check auth state whenever the page loads
+  useEffect(()=> {
+    getAuthState()
+    // eslint-disable-next-line
+  }, [])
+
   const getUserData = async (): Promise<void> => {
     try {
-      const { data } = await axios.get(`${backendUrl}/api/user/data`)
+      const { data } = await axios.get(`${backendUrl}/api/user/data` ,{
+        withCredentials: true
+      })
       if(data.success) {
         setUserData(data.userData)
       } else {

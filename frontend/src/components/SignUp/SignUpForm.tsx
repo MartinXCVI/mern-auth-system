@@ -36,7 +36,7 @@ const SignUpForm = (): JSX.Element => {
         name,
         email,
         password
-      })
+      }, { withCredentials: true })
       // Validating
       if(data.success) {
         toast.success(data.message)

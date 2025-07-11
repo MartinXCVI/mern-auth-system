@@ -29,17 +29,25 @@ const LoginForm = (): JSX.Element => {
       const { data } = await axios.post(`${backendUrl}/api/auth/login`, {
         email,
         password
-      })
+      }, { withCredentials: true })
       // Validating
       if(data.success) {
         setIsLoggedIn(true)
         getUserData()
         toast.success(data.message)
+        navigate('/')
       } else {
         toast.error(data.message)
       }
     } catch(error) {
-      console.error(error)
+      console.error(error instanceof Error ? error.message : error)
+      console.info('backend:', backendUrl)
+      console.info('loginUrl:', `${backendUrl}/api/auth/login`)
+      if(error instanceof Error) {
+        toast.error(error.message)
+      } else {
+        toast.error("Error on logout")
+      }
     }
   }
 

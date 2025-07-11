@@ -3,4 +3,5 @@ export interface IUserData {
   name: string
   email: string
   userData: object;
+  isAccountVerified: boolean;
 }
