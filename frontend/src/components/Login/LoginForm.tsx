@@ -1,25 +1,51 @@
 // React & React hooks imports
-import type { JSX } from 'react'
+import type { JSX, FormEvent, ChangeEvent } from 'react'
 import { useState } from 'react';
-import type { ChangeEvent } from 'react';
 // React Router imports
 import { useNavigate } from 'react-router-dom';
+// Context-related imports
+import { useAppContext } from '../../context/hooks/useAppContext';
 // React icons
 import { BsEnvelope } from "react-icons/bs";
 import { IoIosLock } from "react-icons/io";
 import { FiLogIn } from "react-icons/fi";
+// Utilities imports
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
 
 const LoginForm = (): JSX.Element => {
 
   const navigate = useNavigate()
 
+  const { backendUrl, setIsLoggedIn, getUserData } = useAppContext()
+
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
 
+  const onSubmitLoginHandler = async (event: FormEvent): Promise<void> => {
+    try {
+      event.preventDefault()
+      const { data } = await axios.post(`${backendUrl}/api/auth/login`, {
+        email,
+        password
+      })
+      // Validating
+      if(data.success) {
+        setIsLoggedIn(true)
+        getUserData()
+        toast.success(data.message)
+      } else {
+        toast.error(data.message)
+      }
+    } catch(error) {
+      console.error(error)
+    }
+  }
+
   return (
     <>
-      <form action="">
+      <form onSubmit={onSubmitLoginHandler}>
         {/* EMAIL INPUT */}
         <div className='w-full flex items-center gap-3 mb-4 px-4 py-2.5 rounded-full bg-gray-800'>
           <label htmlFor="email-login" className='min-w-[35%] flex items-center gap-1'>

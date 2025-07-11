@@ -2,6 +2,8 @@
 import type { JSX } from 'react'
 // React router imports
 import { Routes, Route } from 'react-router-dom'
+// React Toastify
+import { ToastContainer } from 'react-toastify';
 // Pages components
 import Home from './pages/Home'
 import Login from './pages/Login'
@@ -13,6 +15,7 @@ import PasswordReset from './pages/PasswordReset'
 const App = (): JSX.Element => {
   return (
     <>
+      <ToastContainer />
       <Routes>
         <Route path='/' element={<Home />} />
         <Route path='/login' element={<Login />} />

@@ -1,27 +1,56 @@
 // React imports
-import type { JSX, ChangeEvent } from 'react'
+import type { JSX, ChangeEvent, FormEvent } from 'react'
 // React hooks
 import { useState } from 'react';
 // React Router imports
 import { useNavigate } from 'react-router-dom';
+// Context-related imports
+import { useAppContext } from '../../context/hooks/useAppContext';
 // React icons
 import { FaRegUser } from "react-icons/fa";
 import { BsEnvelope } from "react-icons/bs";
 import { IoIosLock } from "react-icons/io";
 import { BsPencilSquare } from "react-icons/bs";
+// Utilities imports
+import axios from 'axios';
+import { toast } from 'react-toastify'
 
 
 const SignUpForm = (): JSX.Element => {
 
   const navigate = useNavigate()
 
+  const { backendUrl } = useAppContext()
+
   const [name, setName] = useState<string>('')
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
 
+  const onSubmitRegisterHandler = async (event: FormEvent): Promise<void> => {
+    try {
+      event.preventDefault()
+      // Sending cookies with the request
+      axios.defaults.withCredentials = true
+
+      const { data } = await axios.post(`${backendUrl}/api/auth/register`, {
+        name,
+        email,
+        password
+      })
+      // Validating
+      if(data.success) {
+        toast.success(data.message)
+      } else {
+        toast.error(data.message)
+      }
+    } catch(error) {
+      console.error(error)
+    }
+  }
+
   return (
     <>
-      <form action="">
+      <form onSubmit={onSubmitRegisterHandler}>
         {/* FULL NAME INPUT */}
         <div className='w-full flex items-center gap-3 mb-4 px-4 py-2.5 rounded-full bg-gray-800'>
           <label htmlFor="fullname-signup" className='min-w-[35%] flex items-center gap-1'>

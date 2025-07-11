@@ -1,6 +1,13 @@
-import type { JSX } from 'react'
+// React imports
+import { type JSX } from 'react'
+// Context-related imports
+import { useAppContext } from '../context/hooks/useAppContext'
+
 
 const Header = (): JSX.Element => {
+
+  const { userData } = useAppContext()
+
   return (
     <header className='flex flex-col items-center mt-15 px-4 text-center text-gray-800'>
       <img
@@ -9,7 +16,7 @@ const Header = (): JSX.Element => {
         className='w-50 h-50 rounded-full'
       />
       <h1 className='flex items-center gap-2 text-xl sm:text-3xl font-medium mb-2'>
-        Hello! <img src="/icons/hand-wave-icon.png" className='w-8 aspect-square' alt="" />
+        Hello, {userData ? userData.name : 'Stranger'}! <img src="/icons/hand-wave-icon.png" className='w-8 aspect-square' alt="" />
       </h1>
       <h2 className='text-3xl sm:text-5xl font-semibold mb-4'>
         Welcome to our app
