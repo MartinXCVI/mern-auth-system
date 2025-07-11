@@ -19,7 +19,17 @@ app.use(express.json())
 // Parses incoming cookie headers into objects
 app.use(cookieParser())
 // Allowing CORS operations
-app.use(cors({ credentials: true }))
+app.use(cors({
+  origin: (origin, callback) => {
+    const allowed = ['http://localhost:5173']
+    if(!origin || allowed.includes(origin)) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  },
+  credentials: true
+}))
 
 console.log(`Mode: ${NODE_ENV}`)
 
