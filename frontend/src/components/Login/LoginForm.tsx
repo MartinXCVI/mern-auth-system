@@ -41,8 +41,6 @@ const LoginForm = (): JSX.Element => {
       }
     } catch(error) {
       console.error(error instanceof Error ? error.message : error)
-      console.info('backend:', backendUrl)
-      console.info('loginUrl:', `${backendUrl}/api/auth/login`)
       if(error instanceof Error) {
         toast.error(error.message)
       } else {
