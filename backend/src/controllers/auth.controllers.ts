@@ -7,6 +7,9 @@ import jwt from 'jsonwebtoken'
 import UserModel from "../models/User.model.js"
 import validator from 'validator'
 import transporter from "../config/nodemailer.js"
+// Templates imports
+import { EMAIL_VERIFY_TEMPLATE } from "../templates/emailVerifyTemplate.js"
+import { PASSWORD_RESET_TEMPLATE } from "../templates/passwordResetTemplate.js"
 
 
 /*
@@ -153,7 +156,6 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       message: `User ${user.name} successfully logged in` || "User successfully logged in",
       accessToken: accessToken
     })
-    return
   } catch(error: unknown) {
     console.error(`Login error: ${error instanceof Error ? error.message : error}`)
     res.status(500).json({
@@ -162,6 +164,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       error: error instanceof Error ? error.message : error
     })
   }
+  return
 } // End of login controller
 
 
@@ -259,7 +262,7 @@ export const sendVerifyOtp = async (req: IRequestWithUser, res: Response): Promi
       from: SENDER_EMAIL,
       to: user.email,
       subject: 'Account Verification OTP',
-      text: `Your OTP is ${otp} — Verify your account using this OTP.`
+      html: EMAIL_VERIFY_TEMPLATE.replace("{{otp}}", otp).replace("{{email}}", user.email)
     }
     await transporter.sendMail(mailOptions)
     res.status(200).json({
@@ -348,6 +351,7 @@ export const verifyEmail = async (req: IRequestWithUser, res: Response): Promise
       error: error instanceof Error ? error.message : error
     })
   }
+  return
 } // End of verifyEmail controller
 
 
@@ -413,7 +417,7 @@ export const sendResetOtp = async (req: Request, res: Response): Promise<void> =
       from: SENDER_EMAIL,
       to: user.email,
       subject: 'Password Reset OTP',
-      text: `Your OTP for resetting your password is ${otp} — Use this OTP to proceed with your password reset.`
+      html: PASSWORD_RESET_TEMPLATE.replace("{{otp}}", otp).replace("{{email}}", user.email)
     }
     await transporter.sendMail(mailOptions)
     // Successful response
@@ -429,6 +433,7 @@ export const sendResetOtp = async (req: Request, res: Response): Promise<void> =
       error: error instanceof Error ? error.message : error
     })
   }
+  return
 } // End of sendResetOtp
 
 
@@ -494,4 +499,5 @@ export const resetPassword = async (req: Request, res: Response): Promise<void> 
       error: error instanceof Error ? error.message : error
     })
   }
+  return
 } // End of resetPassword controller
